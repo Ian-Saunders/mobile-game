@@ -9,6 +9,7 @@ window.addEventListener("load", function(){
     let enemies = [];
     let score = 0;
     let debug = false;
+    const fullScreenButton = document.getElementById('fullScreenButton');
     
     const backgroundLayer1 = new Image();
     backgroundLayer1.src = './gfx/layer-1.png';
@@ -230,7 +231,17 @@ window.addEventListener("load", function(){
     }
 
     //
-
+    function toggleFullScreen(){
+        console.log(document.fullscreenElement);
+        if (!doxument.fullscreenElement) {
+            canvas.requestFullscreen().catch(err => {
+                alert(`Error, can't enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+    fullScreenButton.addEventListener('click', toggleFullScreen);
     function handleEnemies(deltaTime){
         if (enemyTimer > enemyInterval + randomEnemyInterval){
             enemies.push(new Enemy(canvas.width, canvas.height));
@@ -256,9 +267,9 @@ window.addEventListener("load", function(){
         if(gameOver){
             context.textAlign = 'center';
             context.fillStyle= 'black';
-            context.fillText('Game Over, press Enter to try again!',canvas.width/2,canvas.height/2);
+            context.fillText('Game Over, press Enter or Swipe Down to try again!',canvas.width/2,canvas.height/2);
             context.fillStyle= 'white';
-            context.fillText('Game Over, press Enter to try again!',canvas.width/2+2,canvas.height/2+2);
+            context.fillText('Game Over, press Enter or Swipe Down to try again!',canvas.width/2+2,canvas.height/2+2);
         }
     }
 
