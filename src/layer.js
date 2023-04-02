@@ -9,14 +9,14 @@ export class Layer {
         this.speedModifier = speedModifier;
         this.speed = this.game.speed * this.speedModifier;
     }
-    init(){
+    init() {
         this.x = 0;
     }
-    update(){
+    update() {
         this.speed = this.game.speed * this.speedModifier;
         this.x = this.game.gameFrame * this.speed % this.width;
     }
-    draw(context){
+    draw(context) {
         context.drawImage(this.image, this.x, this.y, this.width, this.game.height);
         context.drawImage(this.image, this.x + this.width, this.y, this.width, this.game.height);
     }

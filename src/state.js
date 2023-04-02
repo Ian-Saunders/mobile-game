@@ -1,194 +1,168 @@
+import { Dust, Fire, Splash } from './particles.js';
+
 export const states = {
-    STANDING_LEFT: 0,
-    STANDING_RIGHT: 1,
-    SITTING_LEFT: 2,
-    SITTING_RIGHT: 3,
-    RUNNING_LEFT: 4,
-    RUNNING_RIGHT: 5,
-    JUMPING_LEFT: 6,
-    JUMPING_RIGHT: 7,
-    FALLING_LEFT: 8,
-    FALLING_RIGHT: 9,
+    STANDING: 0,
+    SITTING: 1,
+    RUNNING: 2,
+    JUMPING: 3,
+    FALLING: 4,
+    ROLLING: 5,
+    DIVING: 6,
+    HIT: 7,
 }
 class State {
     constructor(state){
         this.state = state;
     }
 }
-export class StandingLeft extends State {
-    constructor(player){
-        super('STANDING_LEFT');
-        this.player = player;
+export class Standing extends State {
+    constructor(game){
+        super('STANDING');
+        this.game = game;
     }
     enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 0;
-        this.player.speed = 0;
-        this.player.maxFrame = 6;
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 0;
+        this.game.player.speed = 0;
+        this.game.player.maxFrame = 6;
+        this.game.input.keys = [];
     }
     handleInput(input){
-        if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.STANDING_RIGHT, 0);
-        else if (input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('Swipe Left') > -1) this.player.setState(states.RUNNING_LEFT, 1);
-        else if (input.keys.indexOf('ArrowDown') > -1 || input.keys.indexOf('Swipe Down') > -1) this.player.setState(states.SITTING_LEFT, 0);
-        else if (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('Swipe Up') > -1) this.player.setState(states.JUMPING_LEFT, 0.5);
+        if (input.keys.includes('ArrowRight') || input.keys.includes('Swipe Right')) this.game.player.setState(states.RUNNING, 1);
+        else if (input.keys.includes('ArrowDown') || input.keys.includes('Swipe Down')) this.game.player.setState(states.SITTING, 0);
+        else if (input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up')) this.game.player.setState(states.JUMPING, 1);
     }
 }
-export class StandingRight extends State {
-    constructor(player){
-        super('STANDING_RIGHT');
-        this.player = player;
+export class Sitting extends State {
+    constructor(game){
+        super('SITTING');
+        this.game = game;
     }
     enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 0;
-        this.player.speed = 0;
-        this.player.maxFrame = 6;
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 5;
+        this.game.player.speed = 0;
+        this.game.player.maxFrame = 4;
+        this.game.input.keys = [];
     }
     handleInput(input){
-        if (input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('Swipe Left') > -1) this.player.setState(states.STANDING_LEFT, 0);
-        else if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.RUNNING_RIGHT, 1);
-        else if (input.keys.indexOf('ArrowDown') > -1 || input.keys.indexOf('Swipe Down') > -1) this.player.setState(states.SITTING_RIGHT, 0);
-        else if (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('Swipe Up') > -1) this.player.setState(states.JUMPING_RIGHT, 0.5);
+        if (input.keys.includes('ArrowUp')) this.game.player.setState(states.STANDING, 0);
+        else if (input.keys.includes('Swipe Up')) this.game.player.setState(states.STANDING, 0);
+        else if ((input.keys.includes('Swipe Down') || input.keys.includes('ArrowDown'))) this.game.player.setState(states.ROLLING, 2);
     }
 }
-export class SittingLeft extends State {
-    constructor(player){
-        super('SITTING_LEFT');
-        this.player = player;
+export class Running extends State {
+    constructor(game){
+        super('RUNNING');
+        this.game = game;
     }
     enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 5;
-        this.player.speed = 0;
-        this.player.maxFrame = 4;
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 3;
+        this.game.player.speed = -this.game.player.maxSpeed;
+        this.game.player.maxFrame = 6;
+        this.game.input.keys = [];
     }
     handleInput(input){
-        if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.SITTING_RIGHT, 0);
-        else if (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('Swipe Up') > -1) {
-            this.player.setState(states.STANDING_LEFT, 0);
-            if (input.keys.indexOf('Swipe Up') > -1) input.keys.splice(input.keys.indexOf('Swipe Up'), 1);
-            if (input.keys.indexOf('ArrowUp') > -1) input.keys.splice(input.keys.indexOf('ArrowUp'), 1);
+        this.game.particles.unshift(new Dust(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight));
+        if (input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up')) this.game.player.setState(states.JUMPING, 1);
+        else if (input.keys.includes('Swipe Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.ROLLING, 2);
+        else if (input.keys.includes('ArrowLeft') || input.keys.includes('Swipe Left')) this.game.player.setState(states.STANDING, 0);
+    }
+}
+export class Jumping extends State {
+    constructor(game){
+        super('JUMPING');
+        this.game = game;
+    }
+    enter(){
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 1;
+        if (this.game.player.onGround()) this.game.player.vy = -30;
+        this.game.player.speed = -this.game.player.maxSpeed * 0.5;
+        this.game.player.maxFrame = 6;
+        this.game.input.keys = [];
+    }
+    handleInput(input){
+         if (this.game.player.onGround()) this.game.player.setState(states.STANDING, 0);
+         else if (this.game.player.vy > 0) this.game.player.setState(states.FALLING, 1);
+         else if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.DIVING, 0);
+    }
+}
+export class Falling extends State {
+    constructor(game){
+        super('FALLING');
+        this.game = game;
+    }
+    enter(){
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 2;
+        this.game.player.maxFrame = 6;
+        this.game.input.keys = [];
+    }
+    handleInput(input){
+        if (this.game.player.onGround()) this.game.player.setState(states.STANDING, 0);
+        else if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.DIVING, 0);
+    }
+}
+export class Rolling extends State {
+    constructor(game){
+        super('ROLLING');
+        this.game = game;
+    }
+    enter(){
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 6;
+        this.game.player.maxFrame = 6;
+        this.game.input.keys = [];
+    }
+    handleInput(input){
+        this.game.particles.unshift(new Fire(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
+        // if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.DIVING, 0);
+        // else 
+        if (input.keys.includes('Swipe Up') || input.keys.includes('ArrowUp')) this.game.player.setState(states.JUMPING, 1);
+        // else if (!input.keys.includes('Pointer Down')) this.game.player.setState(states.RUNNING, 1);
+    }
+}
+export class Diving extends State {
+    constructor(game){
+        super('DIVING');
+        this.game = game;
+    }
+    enter(){
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 6;
+        this.game.player.maxFrame = 6;
+        this.game.input.keys = [];
+        this.game.player.vy =15;
+    }
+    handleInput(input){
+        this.game.particles.unshift(new Fire(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
+        if (this.game.player.onGround() && input.keys.includes('Pointer Down')) this.game.player.setState(states.ROLLING, 1);
+        else if (this.game.player.onGround()) {
+            this.game.player.setState(states.RUNNING, 1);
+            for(let i = 0; i < 30; i++){
+                this.game.particles.unshift(new Splash(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
+            }
         }
     }
 }
-export class SittingRight extends State {
-    constructor(player){
-        super('SITTING_RIGHT');
-        this.player = player;
+export class Hit extends State {
+    constructor(game){
+        super('HIT');
+        this.game = game;
     }
     enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 5;
-        this.player.speed = 0;
-        this.player.maxFrame = 4;
+        this.game.player.frameX = 0;
+        this.game.player.frameY = 4;
+        this.game.player.maxFrame = 10;
+        this.game.input.keys = [];
     }
     handleInput(input){
-        if (input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('Swipe Left') > -1) this.player.setState(states.SITTING_LEFT, 0);
-        else if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.RUNNING_RIGHT, 1);
-        else if (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('Swipe Up') > -1) {
-            this.player.setState(states.STANDING_RIGHT, 0);
-            if (input.keys.indexOf('ArrowUp') > -1) input.keys.splice(input.keys.indexOf('ArrowUp'), 1);
-            if (input.keys.indexOf('Swipe Up') > -1) input.keys.splice(input.keys.indexOf('Swipe Up'), 1);
+        if (this.game.player.frameX >= this.game.player.maxFrame && this.game.player.onGround()) {
+            this.game.player.setState(states.STANDING, 0);
+        } else if (this.game.player.frameX >= this.game.player.maxFrame && this.game.player.onGround()){
+            this.game.player.setState(states.FALLING, 0);
         }
-    }
-}
-export class RunningLeft extends State {
-    constructor(player){
-        super('RUNNING_LEFT');
-        this.player = player;
-    }
-    enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 3;
-        this.player.speed = -this.player.maxSpeed;
-        this.player.maxFrame = 8;
-    }
-    handleInput(input){
-        if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.RUNNING_RIGHT, 1);
-        else if (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('Swipe Up') > -1) this.player.setState(states.JUMPING_LEFT, 1);
-        else if (input.keys.indexOf('ArrowDown') > -1 || input.keys.indexOf('Swipe Down') > -1) this.player.setState(states.SITTING_LEFT, 0);
-    }
-}
-export class RunningRight extends State {
-    constructor(player){
-        super('RUNNING_LEFT');
-        this.player = player;
-    }
-    enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 3;
-        this.player.speed = this.player.maxSpeed;
-        this.player.maxFrame = 8;
-    }
-    handleInput(input){
-        if (input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('Swipe Left') > -1) this.player.setState(states.RUNNING_LEFT, 1);
-        else if (input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('Swipe Up') > -1) this.player.setState(states.JUMPING_RIGHT, 1);
-        else if (input.keys.indexOf('ArrowDown') > -1 || input.keys.indexOf('Swipe Down') > -1) this.player.setState(states.SITTING_RIGHT, 0);
-    }
-}
-export class JumpingLeft extends State {
-    constructor(player){
-        super('JUMPING_LEFT');
-        this.player = player;
-    }
-    enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 3;
-        if (this.player.onGround()) this.player.vy = -30;
-        this.player.speed = -this.player.maxSpeed * 0.5;
-        this.player.maxFrame = 6;
-    }
-    handleInput(input){
-        if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.JUMPING_RIGHT, 1);
-        else if (this.player.onGround()) this.player.setState(states.STANDING_LEFT, 0);
-        else if (this.player.vy > 0) this.player.setState(states.FALLING_LEFT, 1);
-    }
-}
-export class JumpingRight extends State {
-    constructor(player){
-        super('JUMPING_RIGHT');
-        this.player = player;
-    }
-    enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 2;
-        if (this.player.onGround()) this.player.vy = -30;
-        this.player.speed = this.player.maxSpeed * 0.5;
-        this.player.maxFrame = 6;
-    }
-    handleInput(input){
-        if (input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('Swipe Left') > -1) this.player.setState(states.JUMPING_LEFT, 1);
-        else if (this.player.onGround()) this.player.setState(states.STANDING_RIGHT, 0);
-        else if (this.player.vy > 0) this.player.setState(states.FALLING_RIGHT, 1);
-    }
-}
-export class FallingLeft extends State {
-    constructor(player){
-        super('FALLING_LEFT');
-        this.player = player;
-    }
-    enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 2;
-        this.player.maxFrame = 6;
-    }
-    handleInput(input){
-        if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('Swipe Right') > -1) this.player.setState(states.FALLING_RIGHT, 1);
-        else if (this.player.onGround()) this.player.setState(states.STANDING_LEFT, 0);
-    }
-}
-export class FallingRight extends State {
-    constructor(player){
-        super('FALLING_RIGHT');
-        this.player = player;
-    }
-    enter(){
-        this.player.frameX = 0;
-        this.player.frameY = 2;
-        this.player.maxFrame = 6;
-    }
-    handleInput(input){
-        if (input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('Swipe Left') > -1) this.player.setState(states.FALLING_LEFT, 1);
-        else if (this.player.onGround()) this.player.setState(states.STANDING_RIGHT, 0);
     }
 }

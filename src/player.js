@@ -1,10 +1,9 @@
-import { StandingLeft, StandingRight, SittingLeft, SittingRight, RunningLeft, RunningRight, JumpingLeft, JumpingRight, FallingLeft, FallingRight } from './state.js';
+import { Standing, Sitting, Running, Jumping, Falling, Rolling, Diving, Hit } from './state.js';
 export default class Player {
     constructor(game){
         this.game = game;
-        this.states = [new StandingLeft(this), new StandingRight(this), new SittingLeft(this), new SittingRight(this), 
-            new RunningLeft(this), new RunningRight(this), new JumpingLeft(this), new JumpingRight(this), new FallingLeft(this), new FallingRight(this)];
-        this.currentState = this.states[1];
+        this.states = [new Standing(this.game), new Sitting(this.game), new Running(this.game), new Jumping(this.game), new Falling(this.game), new Rolling(this.game), new Diving(this.game), new Hit(this.game)];
+        this.currentState = this.states[0];
         this.img = document.getElementById('playerImage');
         this.width = 100;
         this.height = 91.3;
@@ -26,15 +25,20 @@ export default class Player {
         this.sizeOffset = 2.9;
         this.heightOffset = 1.6;
         this.restart = false;
+        this.lives = 5;
+        this.energy = 0;
     }
     init(){
         this.x = 30;
         this.y = this.game.ground;
         this.frameY = 5;
-        this.currentState = this.states[1];
+        this.lives = 5;
+        this.energy = 0;
+        this.currentState = this.states[0];
         this.speed = 0;
         this.frameTimer = 0;
         this.restart = false;
+        this.game.score = 0;
     }
     setRestart(){
         this.restart = true;
@@ -44,28 +48,42 @@ export default class Player {
         this.game.speed = this.game.maxSpeed * speed;
         this.currentState.enter();
     }
-    update(input, deltaTime, enemies){
+    checkCollisions(){
         // collision detection
-        enemies.forEach(enemy => {
-            const dx = (enemy.x + enemy.width / this.sizeOffset) - (this.x + this.scrWidth / this.widthOffset);
-            const dy = (enemy.y + enemy.height / this.sizeOffset) - (this.y + this.scrHeight / this.heightOffset);
+        this.game.enemies.forEach(enemy => {
+            const dx = (enemy.x + enemy.width / 2) - (this.x + this.scrWidth / this.widthOffset);
+            const dy = (enemy.y + enemy.height / 2) - (this.y + this.scrHeight / this.heightOffset);
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < (enemy.width / enemy.sizeOffset) + (this.scrWidth / this.sizeOffset)){
-                this.game.gameOver = true;
+            if (dist < (enemy.width / 2) + (this.scrWidth / this.sizeOffset)){
+                enemy.delete = true;
+                if (this.currentState === this.states[4] || this.currentState === this.states[5]){
+                    this.game.score++;
+                } else {   
+                    this.setState(7, 0);                
+                    this.lives--;
+                    if (this.lives <= 0) this.game.gameOver = true;
+                }
             }
         });
+    }
+    update(){
+        // collisions
+        this.checkCollisions();
+        this.currentState.handleInput(this.game.input);
         // sprite animation
         if (this.frameTimer > this.frameInterval){
             if (this.frameX >= this.maxFrame) this.frameX =0;
             else this.frameX++;
             this.frameTimer = 0;
         } else {
-            this.frameTimer += deltaTime;
+            this.frameTimer += this.game.deltaTime;
         }
         // controls
-        this.currentState.handleInput(input);
         // horizontal movement
         this.x += this.speed;
+        if (this.game.input.keys.includes('ArrowRight')) this.speed = this.maxSpeed;
+        else if (this.game.input.keys.includes('ArrowLeft')) this.speed = -this.maxSpeed;
+        else this.speed = 0;
         if (this.x < 0) this.x = 0;
         else if (this.x > this.game.width - this.scrWidth) this.x = this.game.width - this.scrWidth;
         // vertical movement

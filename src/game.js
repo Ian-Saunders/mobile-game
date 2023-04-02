@@ -1,7 +1,7 @@
 import Player from './player.js';
 import InputHandler from './input.js';
 import { Background } from './layer.js';
-import { drawStatusText } from './utils.js';
+import { UI } from './UI.js';
 import { FlyingEnemy, GroundEnemy, ClimbingEnemy } from './enemy.js';
 
 export default class Game {
@@ -18,18 +18,26 @@ export default class Game {
         this.enemies = [];
         this.deltaTime = 0;
         this.background = new Background(this);
+        this.particles = [];
         this.layers = [];
         this.lastTime = 0;
         this.player = new Player(this);
         this.input = new InputHandler(this);
+        this.UI = new UI(this);
         this.gameFrame = 0;
         this.speed = 0;
+        this.fontColour = 'rgb(100,255,100)';
+        this.fontSize = 60;
+        this.fontFamily = 'Creepster';
         this.maxSpeed = 6;
         this.score = 0;
-        this.debug = true;
+        this.debug = false;
         this.enemyTimer = 0 ;
         this.enemyInterval = 1000;
         this.randomEnemyInterval = Math.random() * 1000 + 500;
+        this.mouseDown1 = false;
+        this.mouseDown3 = false;
+        this.maxParticles = 50;
     }
     update(){
         this.background.update();
@@ -48,6 +56,14 @@ export default class Game {
         } else {
             this.enemyTimer += this.deltaTime;
         }
+        this.particles.forEach(particle => {
+            particle.update();
+        });
+        if (this.particles.length > this.maxParticles){
+            this.particles = this.particles.slice(0, this.maxParticles);
+        }
+        //console.table(this.particles);
+        this.particles = this.particles.filter(particle => !particle.delete);
         this.enemies = this.enemies.filter(enemy => !enemy.delete);
     }
     draw(){
@@ -57,10 +73,16 @@ export default class Game {
         this.enemies.forEach(enemy => {
             enemy.draw(this.ctx);
         });
-        drawStatusText(this.ctx, this);
+        this.particles.forEach(particle => {
+            particle.draw(this.ctx);
+        });
+        this.UI.draw(this.ctx);
     } 
     addEnemy(){
+        if (this.speed > 0 && Math.random() < 0.5) this.enemies.push(new GroundEnemy(this));
+        else if (this.speed > 0) this.enemies.push(new ClimbingEnemy(this));
         this.enemies.push(new FlyingEnemy(this));
+        //console.log(this.enemies);
     }
     restartGame(){
         this.score = 0;
