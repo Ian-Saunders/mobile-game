@@ -4,6 +4,7 @@ export default class InputHandler {
         this.lastKey = '';
         this.keys = [];
         this.touchY = '';
+        this.touchX = '';
         this.touchThreshold = 30;
         window.addEventListener('keydown', (e) => {
             switch(e.key){
@@ -18,7 +19,9 @@ export default class InputHandler {
                     break;
                 case "ArrowDown":
                     if (this.keys.indexOf(e.key) === -1) this.keys.push('ArrowDown');
-                    if (this.game.gameOver) this.game.restart = true;
+                    if (this.game.gameOver) {
+                        this.game.restart = true;
+                    }
                     break;
             }
         });
@@ -46,20 +49,30 @@ export default class InputHandler {
         });
         window.addEventListener('touchstart', (e) => {
             this.touchY = e.changedTouches[0].pageY;
+            this.touchX = e.changedTouches[0].pageX;
         });
         window.addEventListener('touchmove', (e) => {
-            const swipeDistance = e.changedTouches[0].pageY - this.touchY;
-            console.log('xxxswipe down- '+this.keys.indexOf('Swipe Down'));
-            if (swipeDistance < -this.touchThreshold && this.keys.indexOf('Swipe Up') === -1) {
-               if (this.keys.indexOf('Swipe Up') === -1) this.keys.push('Swipe Up');
-            } else if (swipeDistance > this.touchThreshold && this.keys.indexOf('Swipe Down') === -1) {
-               if (this.keys.indexOf('Swipe Down') === -1) this.keys.push('Swipe Down');
-               if (game.gameOver) game.restart = true;
+            const swipeYDistance = e.changedTouches[0].pageY - this.touchY;
+            const swipeXDistance = e.changedTouches[0].pageX - this.touchX;
+            if (swipeYDistance < -this.touchThreshold && this.keys.indexOf('Swipe Up') === -1) {
+                this.keys.push('Swipe Up');
+            } else if (swipeYDistance > this.touchThreshold && this.keys.indexOf('Swipe Down') === -1) {
+                this.keys.push('Swipe Down');
+                if (game.gameOver) {
+                    this.game.restart = true;
+                }
+            }
+            if (swipeXDistance < -this.touchThreshold && this.keys.indexOf('Swipe Left') === -1) {
+                this.keys.push('Swipe Left');
+            } else if (swipeXDistance > this.touchThreshold && this.keys.indexOf('Swipe Right') === -1) {
+                this.keys.push('Swipe Right');
             }
         });
         window.addEventListener('touchend', (e) => {
             this.keys.splice(this.keys.indexOf('Swipe Up'), 1);
             this.keys.splice(this.keys.indexOf('Swipe Down'), 1);
+            this.keys.splice(this.keys.indexOf('Swipe Left'), 1);
+            this.keys.splice(this.keys.indexOf('Swipe Right'), 1);
         });
     }
 }

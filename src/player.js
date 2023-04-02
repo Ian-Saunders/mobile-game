@@ -6,15 +6,12 @@ export default class Player {
             new RunningLeft(this), new RunningRight(this), new JumpingLeft(this), new JumpingRight(this), new FallingLeft(this), new FallingRight(this)];
         this.currentState = this.states[1];
         this.img = document.getElementById('playerImage');
-        //this.img = document.getElementById('dogImage');
-        this.width = 573;
-        this.height = 523;
+        this.width = 100;
+        this.height = 91.3;
         this.scrWidth = 200;
         this.scrHeight = 180;
-        //this.height = 181.83;
-        this.ground = this.game.height - 100 - 228;
         this.x = 30;
-        this.y = this.ground;
+        this.y = this.game.ground;
         this.frameX = 0;
         this.frameY = 0;
         this.speed = 0;
@@ -22,7 +19,7 @@ export default class Player {
         this.vy = 0;
         this.weight = 1;
         this.maxFrame = 6;
-        this.fps = 30;
+        this.fps = 20;
         this.frameTimer = 0;
         this.frameInterval = 1000 / this.fps;
         this.widthOffset = 1.8;
@@ -32,7 +29,8 @@ export default class Player {
     }
     init(){
         this.x = 30;
-        this.y = this.ground;
+        this.y = this.game.ground;
+        this.frameY = 5;
         this.currentState = this.states[1];
         this.speed = 0;
         this.frameTimer = 0;
@@ -41,8 +39,9 @@ export default class Player {
     setRestart(){
         this.restart = true;
     }
-    setState(state){
+    setState(state, speed){
         this.currentState = this.states[state];
+        this.game.speed = this.game.maxSpeed * speed;
         this.currentState.enter();
     }
     update(input, deltaTime, enemies){
@@ -65,7 +64,6 @@ export default class Player {
         }
         // controls
         this.currentState.handleInput(input);
-
         // horizontal movement
         this.x += this.speed;
         if (this.x < 0) this.x = 0;
@@ -77,12 +75,12 @@ export default class Player {
          } else {
              this.vy = 0;
          }
-         if (this.y > this.ground){
-             this.y = this.ground;
+         if (this.y > this.game.ground){
+             this.y = this.game.ground;
          };
     }
     onGround(){
-        return this.y >= this.ground;
+        return this.y >= this.game.ground;
     }
     draw(context){
         if (this.game.debug) {
