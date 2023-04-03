@@ -19,6 +19,7 @@ export default class Game {
         this.deltaTime = 0;
         this.background = new Background(this);
         this.particles = [];
+        this.collisions = [];
         this.layers = [];
         this.lastTime = 0;
         this.player = new Player(this);
@@ -62,12 +63,15 @@ export default class Game {
         if (this.particles.length > this.maxParticles){
             this.particles = this.particles.slice(0, this.maxParticles);
         }
-        //console.table(this.particles);
+        this.collisions.forEach(collision => {
+            collision.update();
+        });
+        this.collisions = this.collisions.filter(collision => !collision.delete);
         this.particles = this.particles.filter(particle => !particle.delete);
         this.enemies = this.enemies.filter(enemy => !enemy.delete);
     }
     draw(){
-        this.ctx.clearRect(0, 0, this.width, this.height);
+        //this.ctx.clearRect(0, 0, this.width, this.height);
         this.background.draw(this.ctx);
         if (!this.gameOver) this.player.draw(this.ctx);
         this.enemies.forEach(enemy => {
@@ -76,13 +80,15 @@ export default class Game {
         this.particles.forEach(particle => {
             particle.draw(this.ctx);
         });
+        this.collisions.forEach(collision => {
+            collision.draw(this.ctx);
+        });
         this.UI.draw(this.ctx);
     } 
     addEnemy(){
         if (this.speed > 0 && Math.random() < 0.5) this.enemies.push(new GroundEnemy(this));
         else if (this.speed > 0) this.enemies.push(new ClimbingEnemy(this));
         this.enemies.push(new FlyingEnemy(this));
-        //console.log(this.enemies);
     }
     restartGame(){
         this.score = 0;

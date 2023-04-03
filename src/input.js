@@ -63,12 +63,12 @@ export default class InputHandler {
             } 
           });
         window.addEventListener('touchstart', (e) => {
-            e.preventDefault();
+           // e.preventDefault();
             this.touchY = e.changedTouches[0].pageY;
             this.touchX = e.changedTouches[0].pageX;
         });
         window.addEventListener('touchmove', (e) => {
-            e.preventDefault();
+            //e.preventDefault();
             const swipeYDistance = e.changedTouches[0].pageY - this.touchY;
             const swipeXDistance = e.changedTouches[0].pageX - this.touchX;
             if (swipeYDistance < -this.touchThreshold && this.keys.indexOf('Swipe Up') === -1) {

@@ -12,7 +12,13 @@ class Enemy {
         this.y += this.speedY;
         if (this.x < 0 - this.width) {
             this.delete = true;
-            //if (!this.game.gameOver) this.game.score++;
+        }
+        if (this.frameTimer > this.frameInterval){
+            if (this.frameX == this.maxFrame) this.frameX = 0;
+            else this.frameX++;
+            this.frameTimer = 0;
+        } else {
+            this.frameTimer += this.game.deltaTime;
         }
     }
     draw(context){
@@ -44,13 +50,6 @@ export class FlyingEnemy extends Enemy {
     }
     update(){
         super.update();
-        if (this.frameTimer > this.frameInterval){
-            if (this.frameX >= this.maxFrame) this.frameX = 0;
-            else this.frameX++;
-            this.frameTimer = 0;
-        } else {
-            this.frameTimer += this.game.deltaTime;
-        }
         this.angle += this.va;
         this.y += Math.sin(this.angle);
     }
@@ -72,13 +71,6 @@ export class GroundEnemy extends Enemy {
     }
     update(){
         super.update();
-        if (this.frameTimer > this.frameInterval){
-            if (this.frameX >= this.maxFrame) this.frameX = 0;
-            else this.frameX++;
-            this.frameTimer = 0;
-        } else {
-            this.frameTimer += this.game.deltaTime;
-        }
     }
 }
 
@@ -98,13 +90,6 @@ export class ClimbingEnemy extends Enemy {
     }
     update(){
         super.update();
-        if (this.frameTimer > this.frameInterval){
-            if (this.frameX >= this.maxFrame) this.frameX = 0;
-            else this.frameX++;
-            this.frameTimer = 0;
-        } else {
-            this.frameTimer += this.game.deltaTime;
-        }
         if (this.y > this.game.canvas_height * 0.66 || this.y < -60) this.speedY *= -1;
     }
     draw(context){
