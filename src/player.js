@@ -59,7 +59,7 @@ export default class Player {
             if (dist < (enemy.width / 2) + (this.scrWidth / this.sizeOffset)){
                 this.game.collisions.push(new collisionAnimation(this.game, enemy.x + enemy.width/2, enemy.y+enemy.height/2));
                 enemy.delete = true;
-                if (this.currentState === this.states[4] || this.currentState === this.states[5]){
+                if (this.currentState === this.states[5] || this.currentState === this.states[6]){
                     this.game.score++;
                 } else {   
                     this.setState(7, 0);                
@@ -71,7 +71,7 @@ export default class Player {
     }
     update(){
         // collisions
-        this.checkCollisions();
+        if (!this.game.gameOver) this.checkCollisions();
         this.currentState.handleInput(this.game.input);
         // sprite animation
         if (this.frameTimer > this.frameInterval){
@@ -84,8 +84,10 @@ export default class Player {
         // controls
         // horizontal movement
         this.x += this.speed;
-        if (this.game.input.keys.includes('ArrowRight')) this.speed = this.maxSpeed;
-        else if (this.game.input.keys.includes('ArrowLeft')) this.speed = -this.maxSpeed;
+        if ((this.game.input.keys.includes('ArrowRight') || this.game.input.keys.includes('Swipe Right')) && this.currentState != this.states[7]) this.speed = this.maxSpeed;
+        else if ((this.game.input.keys.includes('ArrowLeft') || this.game.input.keys.includes('Swipe Left')) && this.currentState != this.states[7]) this.speed = -this.maxSpeed;
+        else if ((this.game.input.keys.includes('ArrowUp') || this.game.input.keys.includes('Swipe Up')) && this.game.player.onGround()  && this.currentState != this.states[7]) this.game.player.vy = -30;
+        else if ((this.game.input.keys.includes('Pointer Down') || this.game.input.keys.includes('Enter'))) this.currentState = this.states[5];
         else this.speed = 0;
         if (this.x < 0) this.x = 0;
         else if (this.x > this.game.width - this.scrWidth) this.x = this.game.width - this.scrWidth;

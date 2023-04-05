@@ -65,6 +65,7 @@ export class GroundEnemy extends Enemy {
         this.x =game.canvas_width + 50;
         this.y = this.ground;
         this.speedX = 0;
+        this.fps = 10;
         this.speedY = 0;
         this.maxFrame = 1;
         this.img = document.getElementById('enemy_plant');

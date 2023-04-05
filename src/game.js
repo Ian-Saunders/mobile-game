@@ -39,6 +39,8 @@ export default class Game {
         this.mouseDown1 = false;
         this.mouseDown3 = false;
         this.maxParticles = 50;
+        this.time = 30000;
+        this.maxTime = 30000;
     }
     update(){
         this.background.update();
@@ -46,7 +48,6 @@ export default class Game {
         this.enemies.forEach(enemy => {
             enemy.update(this.deltaTime);
         });
-        this.gameFrame--;
         if (this.restart) {
             this.restartGame();
         }
@@ -64,8 +65,11 @@ export default class Game {
             this.particles = this.particles.slice(0, this.maxParticles);
         }
         this.collisions.forEach(collision => {
-            collision.update();
+            if (!this.gameOver) collision.update();
         });
+        this.gameFrame--;
+        this.time -= this.deltaTime;
+        if (this.time < 0) this.gameOver = true;
         this.collisions = this.collisions.filter(collision => !collision.delete);
         this.particles = this.particles.filter(particle => !particle.delete);
         this.enemies = this.enemies.filter(enemy => !enemy.delete);

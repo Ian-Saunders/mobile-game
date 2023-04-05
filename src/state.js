@@ -25,7 +25,7 @@ export class Standing extends State {
         this.game.player.frameY = 0;
         this.game.player.speed = 0;
         this.game.player.maxFrame = 6;
-        this.game.input.keys = [];
+      //  this.game.input.keys = [];
     }
     handleInput(input){
         if (input.keys.includes('ArrowRight') || input.keys.includes('Swipe Right')) this.game.player.setState(states.RUNNING, 1);
@@ -43,7 +43,7 @@ export class Sitting extends State {
         this.game.player.frameY = 5;
         this.game.player.speed = 0;
         this.game.player.maxFrame = 4;
-        this.game.input.keys = [];
+        //this.game.input.keys = [];
     }
     handleInput(input){
         if (input.keys.includes('ArrowUp')) this.game.player.setState(states.STANDING, 0);
@@ -60,8 +60,8 @@ export class Running extends State {
         this.game.player.frameX = 0;
         this.game.player.frameY = 3;
         this.game.player.speed = -this.game.player.maxSpeed;
-        this.game.player.maxFrame = 6;
-        this.game.input.keys = [];
+        this.game.player.maxFrame = 8;
+      //  this.game.input.keys = [];
     }
     handleInput(input){
         this.game.particles.unshift(new Dust(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight));
@@ -78,15 +78,14 @@ export class Jumping extends State {
     enter(){
         this.game.player.frameX = 0;
         this.game.player.frameY = 1;
-        if (this.game.player.onGround()) this.game.player.vy = -30;
         this.game.player.speed = -this.game.player.maxSpeed * 0.5;
         this.game.player.maxFrame = 6;
-        this.game.input.keys = [];
+    //    this.game.input.keys = [];
     }
     handleInput(input){
          if (this.game.player.onGround()) this.game.player.setState(states.STANDING, 0);
          else if (this.game.player.vy > 0) this.game.player.setState(states.FALLING, 1);
-         else if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.DIVING, 0);
+         else if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.DIVING, 1);
     }
 }
 export class Falling extends State {
@@ -98,7 +97,7 @@ export class Falling extends State {
         this.game.player.frameX = 0;
         this.game.player.frameY = 2;
         this.game.player.maxFrame = 6;
-        this.game.input.keys = [];
+      //  this.game.input.keys = [];
     }
     handleInput(input){
         if (this.game.player.onGround()) this.game.player.setState(states.STANDING, 0);
@@ -114,14 +113,14 @@ export class Rolling extends State {
         this.game.player.frameX = 0;
         this.game.player.frameY = 6;
         this.game.player.maxFrame = 6;
-        this.game.input.keys = [];
+      //  this.game.input.keys = [];
     }
     handleInput(input){
         this.game.particles.unshift(new Fire(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
-        // if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.DIVING, 0);
-        // else 
-        if (input.keys.includes('Swipe Up') || input.keys.includes('ArrowUp')) this.game.player.setState(states.JUMPING, 1);
-        // else if (!input.keys.includes('Pointer Down')) this.game.player.setState(states.RUNNING, 1);
+         if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) this.game.player.setState(states.ROLLING, 2);
+        else if ((input.keys.includes('Swipe Up') || input.keys.includes('ArrowUp')) && this.game.player.onGround()) this.game.player.vy = -30;
+        else if (this.game.player.onGround()) this.game.player.setState(states.STANDING, 0); 
+        else this.game.player.setState(states.FALLING, 0); 
     }
 }
 export class Diving extends State {
@@ -133,8 +132,8 @@ export class Diving extends State {
         this.game.player.frameX = 0;
         this.game.player.frameY = 6;
         this.game.player.maxFrame = 6;
-        this.game.input.keys = [];
-        this.game.player.vy =15;
+     //   this.game.input.keys = [];
+        this.game.player.vy = 45;
     }
     handleInput(input){
         this.game.particles.unshift(new Fire(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
@@ -156,7 +155,7 @@ export class Hit extends State {
         this.game.player.frameX = 0;
         this.game.player.frameY = 4;
         this.game.player.maxFrame = 10;
-        this.game.input.keys = [];
+     //   this.game.input.keys = [];
     }
     handleInput(input){
         if (this.game.player.frameX >= this.game.player.maxFrame && this.game.player.onGround()) {
