@@ -26,29 +26,26 @@ export default class Player {
         this.widthOffset = 1.8;
         this.sizeOffset = 2.9;
         this.heightOffset = 1.6;
-        this.restart = false;
-        this.lives = 5;
+        this.lives = 9;
         this.energy = 0;
     }
     init(){
         this.x = 30;
         this.y = this.game.ground;
-        this.frameY = 5;
-        this.lives = 5;
+        this.frameY = 0;
+        this.frameX = 0;
+        this.lives = 9;
         this.energy = 0;
         this.currentState = this.states[0];
         this.speed = 0;
         this.frameTimer = 0;
         this.restart = false;
-        this.game.score = 0;
-    }
-    setRestart(){
-        this.restart = true;
     }
     setState(state, speed){
         this.currentState = this.states[state];
         this.game.speed = this.game.maxSpeed * speed;
         this.currentState.enter();
+        console.log(this.currentState);
     }
     checkCollisions(){
         // collision detection
@@ -64,7 +61,9 @@ export default class Player {
                 } else {   
                     this.setState(7, 0);                
                     this.lives--;
-                    if (this.lives <= 0) this.game.gameOver = true;
+                    if (this.lives <= 0) {
+                        this.game.gameOver = true;
+                    }
                 }
             }
         });
@@ -84,11 +83,15 @@ export default class Player {
         // controls
         // horizontal movement
         this.x += this.speed;
-        if ((this.game.input.keys.includes('ArrowRight') || this.game.input.keys.includes('Swipe Right')) && this.currentState != this.states[7]) this.speed = this.maxSpeed;
-        else if ((this.game.input.keys.includes('ArrowLeft') || this.game.input.keys.includes('Swipe Left')) && this.currentState != this.states[7]) this.speed = -this.maxSpeed;
-        else if ((this.game.input.keys.includes('ArrowUp') || this.game.input.keys.includes('Swipe Up')) && this.game.player.onGround()  && this.currentState != this.states[7]) this.game.player.vy = -30;
-        else if ((this.game.input.keys.includes('Pointer Down') || this.game.input.keys.includes('Enter'))) this.currentState = this.states[5];
-        else this.speed = 0;
+        if ((this.game.input.keys.includes('ArrowRight') || this.game.input.keys.includes('Swipe Right')) && this.currentState != this.states[7]) {
+            this.speed = this.maxSpeed;
+            this.game.input.keys.splice(this.game.input.keys.indexOf('Swipe Right'), 1);
+        } else if ((this.game.input.keys.includes('ArrowLeft') || this.game.input.keys.includes('Swipe Left')) && this.currentState != this.states[7]) {
+            this.speed = -this.maxSpeed;
+            this.game.input.keys.splice(this.game.input.keys.indexOf('Swipe Left'), 1);
+        } else {
+            this.speed = 0;
+        }
         if (this.x < 0) this.x = 0;
         else if (this.x > this.game.width - this.scrWidth) this.x = this.game.width - this.scrWidth;
         // vertical movement

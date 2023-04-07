@@ -60,6 +60,7 @@ export default class InputHandler {
             e.preventDefault();
             if (e.button == 0) {
                 this.keys.push('Pointer Up');
+                this.keys.splice(this.keys.indexOf('Pointer Down'), 1);
             } 
           });
         window.addEventListener('touchstart', (e) => {
@@ -75,7 +76,7 @@ export default class InputHandler {
                 this.keys.push('Swipe Up');
             } else if (swipeYDistance > this.touchThreshold && this.keys.indexOf('Swipe Down') === -1) {
                 this.keys.push('Swipe Down');
-                if (game.gameOver) {
+                if (this.game.gameOver) {
                     this.game.restart = true;
                 }
             }
@@ -93,6 +94,7 @@ export default class InputHandler {
             this.keys.splice(this.keys.indexOf('Swipe Down'), 1);
             this.keys.splice(this.keys.indexOf('Swipe Left'), 1);
             this.keys.splice(this.keys.indexOf('Swipe Right'), 1);
+            this.keys.splice(this.keys.indexOf('Pointer Upd'), 1);
         });
     }
 }

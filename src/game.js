@@ -24,7 +24,7 @@ export default class Game {
         this.lastTime = 0;
         this.player = new Player(this);
         this.input = new InputHandler(this);
-        this.UI = new UI(this);
+        this.gameUI = new UI(this);
         this.gameFrame = 0;
         this.speed = 0;
         this.fontColour = 'rgb(100,255,100)';
@@ -50,6 +50,7 @@ export default class Game {
         });
         if (this.restart) {
             this.restartGame();
+            this.restart = false;
         }
         if (this.enemyTimer > this.enemyInterval + this.randomEnemyInterval){
             this.addEnemy();
@@ -69,13 +70,14 @@ export default class Game {
         });
         this.gameFrame--;
         this.time -= this.deltaTime;
-        if (this.time < 0) this.gameOver = true;
+        if (this.time < 0) {
+            this.gameOver = true;
+        }
         this.collisions = this.collisions.filter(collision => !collision.delete);
         this.particles = this.particles.filter(particle => !particle.delete);
         this.enemies = this.enemies.filter(enemy => !enemy.delete);
     }
     draw(){
-        //this.ctx.clearRect(0, 0, this.width, this.height);
         this.background.draw(this.ctx);
         if (!this.gameOver) this.player.draw(this.ctx);
         this.enemies.forEach(enemy => {
@@ -87,7 +89,7 @@ export default class Game {
         this.collisions.forEach(collision => {
             collision.draw(this.ctx);
         });
-        this.UI.draw(this.ctx);
+        this.gameUI.draw(this.ctx);
     } 
     addEnemy(){
         if (this.speed > 0 && Math.random() < 0.5) this.enemies.push(new GroundEnemy(this));
@@ -104,10 +106,10 @@ export default class Game {
         this.speed = 0;
         this.maxSpeed = 3;
         this.gameOver = false;
-        this.gameFrame =0;
-        this.lastTime = 0;
+        this.gameFrame = 0;
         this.deltaTime = 0;
         this.enemyTimer = 0;
-        this.restart = false;
+        this.time = 30000;
+        this.maxTime = 30000;
     }
 }
