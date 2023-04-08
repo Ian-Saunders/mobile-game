@@ -15,27 +15,28 @@ export default class Game {
         this.gameOver = false;
         this.restart = false;
         this.ground = this.canvas_height - 100 - 160;
-        this.enemies = [];
         this.deltaTime = 0;
+        this.lastTime = 0;
+        this.gameFrame = 0;
+        this.speed = 0;
+        this.maxSpeed = 6;
         this.background = new Background(this);
         this.player = new Player(this);
         this.input = new InputHandler(this);
         this.gameUI = new UI(this);
         this.particles = [];
         this.collisions = [];
+        this.maxParticles = 200;
         this.layers = [];
-        this.lastTime = 0;
-        this.gameFrame = 0;
-        this.speed = 0;
-        this.maxSpeed = 6;
-        this.score = 0;
-        this.debug = false;
+        this.enemies = [];
+        this.floatingMessages = [];
         this.enemyTimer = 0 ;
         this.enemyInterval = 1000;
         this.randomEnemyInterval = Math.random() * 1000 + 500;
-        this.maxParticles = 200;
+        this.score = 0;
         this.time = 30000;
         this.maxTime = 30000;
+        this.debug = false;
     }
     update(){
         this.background.update();
@@ -60,6 +61,9 @@ export default class Game {
         if (this.particles.length > this.maxParticles){
             this.particles = this.particles.slice(0, this.maxParticles);
         }
+        this.floatingMessages.forEach(floatingMessage => {
+            floatingMessage.update();
+        });
         this.collisions.forEach(collision => {
             if (!this.gameOver) collision.update();
         });
@@ -81,6 +85,9 @@ export default class Game {
         this.particles.forEach(particle => {
             particle.draw(this.ctx);
         });
+        this.floatingMessages.forEach(floatingMessage => {
+            floatingMessage.draw(this.ctx);
+        });
         this.collisions.forEach(collision => {
             collision.draw(this.ctx);
         });
@@ -98,13 +105,15 @@ export default class Game {
             layer.init();
         });
         this.enemies = [];
+        this.collisions = [];
+        this.particles = [];
+        this.input.keys = [];
         this.speed = 0;
         this.maxSpeed = 3;
         this.gameOver = false;
         this.gameFrame = 0;
         this.deltaTime = 0;
         this.enemyTimer = 0;
-        this.time = 30000;
-        this.maxTime = 30000;
+        this.time = this.maxTime;
     }
 }
