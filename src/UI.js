@@ -47,11 +47,11 @@ export class UI {
             context.fillText('Swipe Left ' + (this.game.input.keys.includes('Swipe Left')), this.game.width / 2,450);
             context.fillText('Swipe Right ' + (this.game.input.keys.includes('Swipe Right')), this.game.width / 2,500);
         }
-        context.fillStyle = 'orange';
-        context.font = this.fontSize + 'px ' + this.fontFamily;
-        context.fillText('Pointer X ' + (this.game.input.mouseX), 450+this.game.width / 2,250);
-        context.fillText('Pointer Y ' + (this.game.input.mouseY), 450+this.game.width / 2,300);
-        context.fillText('Player X ' + (this.game.player.x), 450+this.game.width / 2,350);
-        context.fillText('Player Y ' + (this.game.player.y), 450+this.game.width / 2,400);
+        // context.fillStyle = 'orange';
+        // context.font = this.fontSize + 'px ' + this.fontFamily;
+        // context.fillText('Pointer X ' + (this.game.input.mouseX), 450+this.game.width / 2,250);
+        // context.fillText('Pointer Y ' + (this.game.input.mouseY), 450+this.game.width / 2,300);
+        // context.fillText('Player X ' + (this.game.player.x), 450+this.game.width / 2,350);
+        // context.fillText('Player Y ' + (this.game.player.y), 450+this.game.width / 2,400);
     }
 }
