@@ -46,6 +46,7 @@ export default class Player {
         this.game.speed = this.game.maxSpeed * speed;
         this.currentState.enter();
         console.log(this.currentState);
+        console.table(this.game.input.keys);
     }
     checkCollisions(){
         // collision detection
@@ -83,12 +84,10 @@ export default class Player {
         // controls
         // horizontal movement
         this.x += this.speed;
-        if ((this.game.input.keys.includes('ArrowRight') || this.game.input.keys.includes('Swipe Right')) && this.currentState != this.states[7]) {
-            this.speed = this.maxSpeed;
-            this.game.input.keys.splice(this.game.input.keys.indexOf('Swipe Right'), 1);
-        } else if ((this.game.input.keys.includes('ArrowLeft') || this.game.input.keys.includes('Swipe Left')) && this.currentState != this.states[7]) {
+        if ((this.game.input.keys.includes('ArrowLeft') || this.game.input.keys.includes('Swipe Left')) && this.currentState != this.states[7]) {
             this.speed = -this.maxSpeed;
-            this.game.input.keys.splice(this.game.input.keys.indexOf('Swipe Left'), 1);
+        } else if ((this.game.input.keys.includes('ArrowRight') || this.game.input.keys.includes('Swipe Right')) && this.currentState != this.states[7]) {
+            this.speed = this.maxSpeed;
         } else {
             this.speed = 0;
         }

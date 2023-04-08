@@ -5,6 +5,9 @@ export default class InputHandler {
         this.keys = [];
         this.touchY = '';
         this.touchX = '';
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.touchDown1 = false;
         this.touchThreshold = 30;
         window.addEventListener('keydown', (e) => {
             switch(e.key){
@@ -48,28 +51,12 @@ export default class InputHandler {
                     break;
             }
         });
-        window.addEventListener('pointerdown', (e) => {
-           // console.log(e);
-            e.preventDefault();
-            if (e.button == 0) {
-                this.keys.push('Pointer Down');
-            } 
-          });
-          window.addEventListener('pointerup', (e) => {
-            //console.log(e);
-            e.preventDefault();
-            if (e.button == 0) {
-                this.keys.push('Pointer Up');
-                this.keys.splice(this.keys.indexOf('Pointer Down'), 1);
-            } 
-          });
         window.addEventListener('touchstart', (e) => {
-           // e.preventDefault();
+            this.keys.push('Pointer Down');
             this.touchY = e.changedTouches[0].pageY;
             this.touchX = e.changedTouches[0].pageX;
         });
         window.addEventListener('touchmove', (e) => {
-            //e.preventDefault();
             const swipeYDistance = e.changedTouches[0].pageY - this.touchY;
             const swipeXDistance = e.changedTouches[0].pageX - this.touchX;
             if (swipeYDistance < -this.touchThreshold && this.keys.indexOf('Swipe Up') === -1) {
@@ -82,19 +69,15 @@ export default class InputHandler {
             }
             if (swipeXDistance < -this.touchThreshold && this.keys.indexOf('Swipe Left') === -1) {
                 this.keys.push('Swipe Left');
-                //console.log('Swipe Left');
             } else if (swipeXDistance > this.touchThreshold && this.keys.indexOf('Swipe Right') === -1) {
                 this.keys.push('Swipe Right');
-                //console.log('Swipe Right');
             }
+            this.mouseY = e.changedTouches[0].pageY;
+            this.mouseX = e.changedTouches[0].pageX;
         });
-        window.addEventListener('touchend', (e) => {
+        window.addEventListener('touchend', (e)=> {
             e.preventDefault();
-            this.keys.splice(this.keys.indexOf('Swipe Up'), 1);
-            this.keys.splice(this.keys.indexOf('Swipe Down'), 1);
-            this.keys.splice(this.keys.indexOf('Swipe Left'), 1);
-            this.keys.splice(this.keys.indexOf('Swipe Right'), 1);
-            this.keys.splice(this.keys.indexOf('Pointer Upd'), 1);
+            this.keys = [];
         });
     }
 }

@@ -14,37 +14,32 @@ export default class Game {
         this.canvas_height = canvas.height = 900;
         this.gameOver = false;
         this.restart = false;
-        this.ground = this.canvas_height - 100 - 228;
+        this.ground = this.canvas_height - 100 - 160;
         this.enemies = [];
         this.deltaTime = 0;
         this.background = new Background(this);
+        this.player = new Player(this);
+        this.input = new InputHandler(this);
+        this.gameUI = new UI(this);
         this.particles = [];
         this.collisions = [];
         this.layers = [];
         this.lastTime = 0;
-        this.player = new Player(this);
-        this.input = new InputHandler(this);
-        this.gameUI = new UI(this);
         this.gameFrame = 0;
         this.speed = 0;
-        this.fontColour = 'rgb(100,255,100)';
-        this.fontSize = 60;
-        this.fontFamily = 'Creepster';
         this.maxSpeed = 6;
         this.score = 0;
         this.debug = false;
         this.enemyTimer = 0 ;
         this.enemyInterval = 1000;
         this.randomEnemyInterval = Math.random() * 1000 + 500;
-        this.mouseDown1 = false;
-        this.mouseDown3 = false;
-        this.maxParticles = 50;
+        this.maxParticles = 200;
         this.time = 30000;
         this.maxTime = 30000;
     }
     update(){
         this.background.update();
-        this.player.update(this.input, this.deltaTime, this.enemies);
+        if (!this.gameOver) this.player.update(this.input, this.deltaTime, this.enemies);
         this.enemies.forEach(enemy => {
             enemy.update(this.deltaTime);
         });

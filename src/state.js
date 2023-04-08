@@ -27,14 +27,13 @@ export class Standing extends State {
         this.game.player.maxFrame = 6;
     }
     handleInput(input){
-        if (input.keys.includes('ArrowRight') || input.keys.includes('Swipe Right')) { 
-            this.game.player.setState(states.RUNNING, 1);
-        } else if (input.keys.includes('ArrowDown') || input.keys.includes('Pointer Down')) { 
-            this.game.player.setState(states.SITTING, 0);
-           // input.keys.splice(input.keys.indexOf('Pointer Down'), 1);
+        if ((!input.keys.includes('Swipe Up') && !input.keys.includes('Swipe Down') && !input.keys.includes('ArrowDown')) && input.keys.includes('Pointer Down')) {
+            this.game.player.setState(states.ROLLING, 1);
+          //  input.keys.splice(input.keys.indexOf('Pointer Down'), 1);
         } else if ((input.keys.includes('ArrowLeft') || input.keys.includes('Swipe Left')) || (input.keys.includes('ArrowRight') || input.keys.includes('Swipe Right'))) { 
-            this.game.player.setState(states.RUNNING, 1);    
-        } else if (input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up')) { 
+            this.game.player.setState(states.RUNNING, 1);
+        } else if ((input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up'))&& this.game.player.onGround()) { 
+            this.game.player.vy = -30;
             this.game.player.setState(states.JUMPING, 1);
         }
     }
@@ -51,8 +50,15 @@ export class Sitting extends State {
         this.game.player.maxFrame = 4;
     }
     handleInput(input){input
-        if ((input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown'))) { 
+        // if (input.keys.includes('Pointer Down')){
+        //     this.game.player.setState(states.ROLLING, 2);
+        // } else 
+        if ((!input.keys.includes('Swipe Down') && !input.keys.includes('ArrowDown')) && input.keys.includes('Pointer Down')) {
             this.game.player.setState(states.ROLLING, 2);
+           input.keys.splice(input.keys.indexOf('Pointer Down'), 1);
+        } else if ((input.keys.includes('Swipe Down') || input.keys.includes('ArrowDown'))) { 
+            this.game.player.setState(states.ROLLING, 2);
+            input.keys.splice(input.keys.indexOf('Swipe Down'), 1);
         } else if (input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up')) { 
             this.game.player.setState(states.STANDING, 0);
             input.keys.splice(input.keys.indexOf('Swipe Up'), 1);
@@ -93,12 +99,13 @@ export class Jumping extends State {
         this.game.player.maxFrame = 6;
     }
     handleInput(input){
-        if (this.game.player.onGround()) {
-            this.game.player.setState(states.STANDING, 0);
-        } else if (this.game.player.vy > 0) {
+        
+        if (this.game.player.vy > 0) {
             this.game.player.setState(states.FALLING, 1);
         } else if (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown')) {
             this.game.player.setState(states.DIVING, 1);
+        } else if (this.game.player.onGround()) {
+            this.game.player.setState(states.STANDING, 0);
         }
     }
 }
@@ -132,12 +139,13 @@ export class Rolling extends State {
     }
     handleInput(input){
         this.game.particles.unshift(new Fire(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2)); 
-        if (this.game.player.onGround() && ((input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up')))) {
+        if (!this.game.player.onGround() &&(input.keys.includes('Swipe Down') || input.keys.includes('ArrowDown'))) {
+            this.game.player.setState(states.DIVING, 1);
+        } else if (this.game.player.onGround() && ((input.keys.includes('ArrowUp') || input.keys.includes('Swipe Up')))) {
             this.game.player.vy = -30;
+        } else if (this.game.player.onGround() && (input.keys.includes('Pointer Down') || input.keys.includes('ArrowDown'))) {
             this.game.player.setState(states.ROLLING, 2); 
-        } else if (this.game.player.onGround() && (input.keys.includes('Pointer Down')|| input.keys.includes('ArrowDown'))) {
-            this.game.player.setState(states.ROLLING, 2); 
-        } else if (this.game.player.onGround()){
+        } else if (this.game.player.onGround() && ((!input.keys.includes('Pointer Down') && !input.keys.includes('ArrowDown')))){
             this.game.player.setState(states.STANDING, 0);
         }
     }
@@ -154,13 +162,13 @@ export class Diving extends State {
         this.game.player.vy = 45;
     }
     handleInput(input){
-        this.game.particles.unshift(new Fire(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
+        this.game.particles.unshift(new Fire(this.game, (this.game.player.x + this.game.player.scrWidth/2), this.game.player.y+this.game.player.scrHeight/2));
         if (this.game.player.onGround() && input.keys.includes('Pointer Down')) {
             this.game.player.setState(states.ROLLING, 1);
-        } else if (this.game.player.onGround()) {
+        } else if (this.game.player.onGround() && !input.keys.includes('Pointer Down')) {
             this.game.player.setState(states.RUNNING, 1);
             for(let i = 0; i < 30; i++){
-                this.game.particles.unshift(new Splash(this.game, this.game.player.x + this.game.player.scrWidth/2, this.game.player.y+this.game.player.scrHeight/2));
+                this.game.particles.unshift(new Splash(this.game, (this.game.player.x + this.game.player.scrWidth/2), (this.game.player.y+this.game.player.scrHeight/2)-24));
             }
         }
     }
